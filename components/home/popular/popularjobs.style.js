@@ -11,8 +11,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  headerImages: {
+    size:SIZES.large,
+  },
   headerTitle: {
-    fontSize: SIZES.large,
+    fontSize: SIZES.medium,
     fontFamily: FONT.medium,
     color: COLORS.primary,
   },
