@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { COLORS, FONTS } from '../../constants';
 import { Chat, Contact, More, Profile, Welcome, Home } from '../screens';
 import { FontAwesome, Feather, Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
+import DrawerNavigator from './DrawerNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,12 +22,12 @@ const BottomTabNavigation = () => {
           right: 0,
           left: 0,
           elevation: 0,
-          height: 60
+          height: 50
         }
       }}>
       <Tab.Screen
         name='Home'
-        component={Home}
+        component={DrawerNavigator}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
