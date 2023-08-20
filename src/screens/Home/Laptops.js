@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, SafeAreaView ,TextInput } from 'react-native';
+import { View, FlatList, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
 import { COLORS, FONTS, images, SIZES } from '../../../constants';
 import { Card, Text } from 'react-native-paper';
 import PageContainer from '../../components/PageContainer';
@@ -12,8 +12,7 @@ const Laptops = ({ navigation }) => {
 
     const [products, setProducts] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-    const [filteredProduct, setFilteredProduct] = useState(products)
+    const [searchQuery, setSearchQuery] = useState('');
 
     const getProducts = async () => {
         try {
@@ -36,15 +35,9 @@ const Laptops = ({ navigation }) => {
     const skeletonCount = 10; // Set the number of skeleton cards
     const cardsPerRow = 2; // Number of skeleton cards per row
 
-    const handleSearch = (text) => {
-        setSearch(text);
-        const filteredData = products.filter((product) =>
-            product.name.toLowerCase().includes(text.toLowerCase())
-        );
-        setFilteredProduct(filteredData);
-    }
 
-    
+
+
 
 
     const renderProducts = ({ item }) => (
@@ -127,8 +120,8 @@ const Laptops = ({ navigation }) => {
                                     marginHorizontal: 12,
                                 }}
                                 placeholder="Search Contact..."
-                                value={search}
-                                onChangeText={handleSearch}
+                                value={searchQuery}
+                                onChangeText={(text) => setSearchQuery(text)}
                             />
                         </View>
 
@@ -145,7 +138,7 @@ const Laptops = ({ navigation }) => {
                         ) : (
 
                             < FlatList
-                                data={products}
+                                data={products.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))}
                                 keyExtractor={(item) => item._id}
                                 renderItem={renderProducts}
                                 numColumns={2}

@@ -5,6 +5,7 @@ import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, images, SIZES } from '../../../constants';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import { getUserData } from '../auth/Storage'
 
 const SingleProduct = ({ navigation }) => {
 
@@ -12,14 +13,16 @@ const SingleProduct = ({ navigation }) => {
     const { productId } = route.params;
     const [product, setProduct] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const [cart, setCart] = useState([]);
+    const [price, setPrice] = useState(product.price);
+    const [quantity, setQuantity] = useState(1);
 
     const getProductDetail = async () => {
 
         try {
-            const response = await axios.get(`http://192.168.42.7:5000/ProductDetails/${productId}`)
+            const response = await axios.get(`http://192.168.42.184:5000/ProductDetails/${productId}`)
             setProduct(response.data.getSingleProducts);
-            console.log('product get sucessfully')
+            console.log('product get sucessfully',)
             setLoading(false);
         } catch (error) {
             console.log('Error fecthing product deatils:', error.message);
@@ -30,32 +33,60 @@ const SingleProduct = ({ navigation }) => {
 
     const addToCart = async () => {
         try {
-            const response = await axios.post('http://192.168.42.7:5000/add-to-cart', { productId: product.id });
-
-            console.log('Product added to cart:', response.data);
+            if (userData && userData.isAuth) {
+                console.log('Please log in first.');
+                navigation.navigate('Login');
+            } else {
+                const response = await axios.post('http://192.168.42.184:5000/add-to-cart', {
+                    product: product._id,
+                    quantity,
+                    price: product.price
+                });
+                setCart([...cart, response.data.cartItem]);
+                setPrice(response.data.price)
+                console.log(response.data.message);
+            }
         } catch (error) {
-            console.log('Error adding product to cart:', error.message);
+            console.log('Error to add the product in to cart:', error.message)
         }
     }
+
 
     useEffect(() => {
         getProductDetail();
     }, []);
 
-    if (loading) {
-        return (
-            <SafeAreaView>
-                <PageContainer>
-                    <View>
-                        <Text>
-                            Loading...
-                        </Text>
-                    </View>
-                </PageContainer>
-            </SafeAreaView>
-        )
-    }
+    // const [userData, setUserData] = useState(null);
 
+    // useEffect(() => {
+    //     const fetchUserData = async () => {
+    //         const user = await getUserData();
+    //         if (user) {
+    //             setUserData(user);
+    //             console.log("This is the userData:")
+    //             console.log("Avatar URL:", userData?.avatar?.url);
+    //         }
+    //     }
+
+    //     fetchUserData();
+    // }, []);
+
+
+    const addToWhishList = async () => {
+        try {
+            if (userData && userData.isAuth) {
+                console.log('Please log in first.');
+                navigation.navigate('Login')
+            } else {
+                const response = await axios.post('http://192.168.42.184:5000/whishlist', {
+                    product: product._id,
+                });
+                console.log(response.data.message);
+            }
+        } catch (error) {
+            console.log('Error adding product to whishlist', error.message)
+        }
+    }
 
     return (
         <SafeAreaView>
@@ -92,18 +123,20 @@ const SingleProduct = ({ navigation }) => {
                                 height: 250,
                                 width: 300,
                             }}
+                            onError={(error) => console.log('Image loading error:', error)}
                         />
 
-                        <TouchableOpacity >
-                            <AntDesign name='hearto'
-                                size={28}
-                                style={{ color: COLORS.secondaryBlack }}
-                            />
-
-                            <AntDesign name='sharealt' size={28}
-                                style={{ color: COLORS.secondaryBlack, marginVertical: 35 }} />
-                        </TouchableOpacity>
-
+                        <View>
+                            <TouchableOpacity onPress={addToWhishList} >
+                                <AntDesign name='hearto'
+                                    size={28}
+                                    style={{ color: COLORS.secondaryBlack }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                                <AntDesign name='sharealt' size={28}
+                                    style={{ color: COLORS.secondaryBlack, marginVertical: 35 }} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     <View style={{

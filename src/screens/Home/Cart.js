@@ -1,90 +1,84 @@
-import React, { useEffect, useState } from 'react'
-import { Image, SafeAreaView, View, Text, TouchableOpacity } from 'react-native'
-import PageContainer from '../../components/PageContainer'
+import React, { useEffect, useState } from 'react';
+import { Image, SafeAreaView, View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { COLORS, FONTS, images, SIZES } from '../../../constants';
-import { useRoute } from '@react-navigation/native';
+import { COLORS, FONTS, SIZES } from '../../../constants';
 import axios from 'axios';
 
-
 const Cart = () => {
+    // const POLL_INTERVAL = 5000;
+    const [cartItems, setCartItems] = useState([]);
+
+    const GetCartDetails = async () => {
+        try {
+            const response = await axios.get('http://192.168.42.184:5000/cart');
+            setCartItems(response.data.cartItems);
+            console.log(response.data.cartItems);
+        } catch (error) {
+            console.log('Error fetching cart items:', error.message);
+        }
+    }
+
+    const updateCartItems = (updatedItem) => {
+        setCartItems(prevCarttems => {
+            const updatedCartItems = prevCarttems.map(item => {
+                if (cartItems._id === updatedItem._id) {
+                    return { ...item, quantity: updatedItem.quantity, product: { ...item.product, price: updatedItem.product.price } }
+                }
+                return item;
+            })
+            return updatedCartItems
+        })
+    }
+
+    //poll again after a delay
+    // setTimeout(GetCartDetails, POLL_INTERVAL)
+
+    useEffect(() => {
+        GetCartDetails();
+    }, []);
+
+    const renderCartItem = ({ item }) => (
+        <View style={{
+            flex: 1,
+            marginVertical: 10,
+            width: '50%',
+            paddingHorizontal: 5,
+            marginVertical: 5
+        }}>
+            <Image
+                source={{ uri: item.product.images[0].url }}
+                resizeMode="cover"
+                style={{
+                    height: 150,
+                    width: 150,
+                }}
+            />
+            <Text style={{ ...FONTS.h4 }}>
+                {item.product.name}
+            </Text>
+            <Text style={{ ...FONTS.body4 }}>
+                Price: ₹{item.product.price * item.quantity}
+            </Text>
+            <Text style={{ ...FONTS.body4 }}>
+                Quantity: {item.quantity}
+            </Text>
+        </View>
+    );
+
     return (
         <SafeAreaView>
-            <PageContainer>
-                <View style={{ flex: 1 }}>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginHorizontal: 22,
-                            marginTop: 35,
-                            paddingBottom: 10
-                        }}
-                    >
-                        <TouchableOpacity onPress={() => navigation.navigate("Home")}
-                            style={{ marginLeft: -10 }} >
-                            <MaterialIcons name='keyboard-arrow-left'
-                                size={28}
-                                style={{ color: COLORS.secondaryBlack }} />
-                        </TouchableOpacity>
-                        <Text style={{ ...FONTS.h4 }}>Cart Details</Text>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Image
-                            source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
-                            resizeMode="contain"
-                            style={{
-                                height: 250,
-                                width: 300,
-                            }}
-                        />
-
-                    </View>
-
-                    <View style={{
-                        backgroundColor: COLORS.secondaryWhite,
-                        borderTopLeftRadius: 25,
-                        borderTopRightRadius: 25,
-                        height: '60%',
-                        width: '100%',
-                        shadowColor: COLORS.secondaryBlack,
-                        shadowOffset: {
-                            width: 0,
-                            height: 3,
-                        },
-                        shadowOpacity: 0.27,
-                        shadowRadius: 4.65,
-                        elevation: 6
-                    }}>
-
-                        <View style={{
-                            color: COLORS.secondaryBlack,
-                            paddingHorizontal: 22,
-                            marginVertical: 22
-                        }}>
-                            <Text style={{ ...FONTS.h2, paddingBottom: 10 }}>
-                                {product.name}
-                            </Text>
-
-                            <Text style={{ ...FONTS.h4, marginVertical: 15, paddingBottom: 10 }}>
-                                Lenovo Flex - 3 Core i5 12th Gen - (16 GB/512 GB SSD/Windows 11 Home/4 GB Graphics/NVIDIA GeForce RTX 3050) AN515-58 Gaming Laptop  (15.6 inch, Shale Black, 2.5 kg)
-                            </Text>
-
-                            <Text style={{ ...FONTS.h4, marginVertical: 15, paddingTop: 15 }}>
-                                ₹{product.price}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-            </PageContainer>
-        </SafeAreaView >
+            {/* ... Your other components */}
+            <FlatList
+                data={cartItems}
+                keyExtractor={(item) => item._id}
+                renderItem={renderCartItem}
+                contentContainerStyle={{
+                    // Add your flatlist's container styling here
+                }}
+            />
+            {/* ... Rest of your components */}
+        </SafeAreaView>
     )
 }
 
-export default Cart
+export default Cart;

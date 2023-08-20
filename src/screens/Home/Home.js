@@ -10,7 +10,7 @@ import {
     StyleSheet,
 } from 'react-native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { COLORS, FONTS, images, SIZES } from '../../../constants';
 import PageContainer from '../../components/PageContainer';
 import { ScrollView } from 'react-native';
@@ -20,6 +20,8 @@ import { Card, } from 'react-native-paper';
 import axios from 'axios'
 import SkeletonCard from '../popular/SkeletonCard';
 import Product from '../popular/Product';
+import CategoryButton from './Categories';
+import Banner from './Banner';
 
 const Home = ({ navigation }) => {
 
@@ -28,18 +30,18 @@ const Home = ({ navigation }) => {
     const [filteredProducts, setFilteredProducts] = useState(products)
     const [isLoading, setLoading] = useState(true);
 
+    const nav = useNavigation();
+
     const getProduct = async () => {
         try {
-            const response = await axios.get('http://192.168.42.16:5000/getProducts')
-                .then((Res) => {
-                    setProducts(Res.data.Products);
-                    setLoading(false)
-                    // console.log(Res.data)
-                    console.log('data get sucessfully')
-                })
-        } catch {
+            const response = await axios.get('http://192.168.42.184:5000/getProducts')
+            setProducts(response.data.Products);
+            setLoading(false)
+            // console.log(Res.data)
+            console.log('data get sucessfully')
+        } catch (error) {
             // Handle API call or AsyncStorage access error
-            console.error('Error during login:', error);
+            console.error('Error during login:', error.message);
             setLoading(false);
         }
     };
@@ -48,16 +50,28 @@ const Home = ({ navigation }) => {
         getProduct();
     }, [])
 
+
     const currentProducts = products.slice(0, 2);
 
+    const skeletonCount = 4;// Set the number of skeleton cards you want to display
 
+    const categories = ['Laptops', 'Computers', 'Accessories'] // List of categories
 
+    const handleCategoryPress = (Category) => {
+        // Use the navigate function to navigate to the desired screen
+        nav.navigate(Category); // screen names match the category names
+    }
+
+    const handleDrawerOpen = () => {
+        nav.dispatch(DrawerActions.openDrawer())
+    };
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <PageContainer>
                 <ScrollView>
                     <View style={{ flex: 1 }}>
+                        {/* Header  */}
                         <View
                             style={{
                                 flexDirection: 'row',
@@ -67,7 +81,7 @@ const Home = ({ navigation }) => {
                                 marginTop: 35,
                             }}
                         >
-                            <TouchableOpacity  >
+                            <TouchableOpacity onPress={handleDrawerOpen} >
                                 <Image
                                     source={images.user4}
                                     resizeMode="contain"
@@ -86,152 +100,32 @@ const Home = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
 
-                        <View
-                            style={{
-                                marginHorizontal: 22,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                backgroundColor: COLORS.secondaryWhite,
-                                height: 48,
-                                marginVertical: 22,
-                                paddingHorizontal: 12,
-                                borderRadius: 20,
-                            }}
-                        >
-                            <Ionicons name="ios-search-outline" size={24} color={COLORS.black} />
+                        {/* // Banner Section */}
+                        <Banner />
 
-                            <TextInput
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    marginHorizontal: 12,
-                                }}
-                                placeholder="Search Contact..."
-
-                            />
-                        </View>
-
+                        {/* Categories Section */}
                         <View style={{
-                            backgroundColor: COLORS.primaryBlue,
-                            height: 'auto',
-                            width: 'auto',
-                            borderRadius: 15,
+                            flexDirection: 'row',
                             marginHorizontal: 25,
-                            // marginVertical: 35,
+                            marginVertical: 5
                         }}>
-
-                            <Text style={{
-                                color: COLORS.secondaryGray,
-                                alignItems: 'center',
-                                ...FONTS.body4,
-                                paddingHorizontal: 18,
-                                paddingVertical: 10
-                            }}>
-                                Zenbook Duo
-                            </Text>
-
-                            <View style={{
-                                paddingHorizontal: 18,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between'
-                            }}>
-                                <Text style={{
-                                    color: COLORS.secondaryWhite,
-                                    ...FONTS.h4,
-                                    lineHeight: 26
-                                }}>
-                                    Unbelievable Visual
-                                    & Performance
-                                </Text>
-
-                                <View style={{
-                                    marginTop: -35,
-                                }}>
-                                    <Image
-                                        source={require("../../../assets/images/banner.png")}
-                                        style={{
-                                            height: 112,
-                                            width: 112,
-                                        }}
+                            {/* Display category buttons using a horizontal ScrollView */}
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                            >
+                                {categories.map((category, index) => (
+                                    <CategoryButton
+                                        key={index}
+                                        title={category}
+                                        onPress={() => handleCategoryPress(category)} // Pass the category to the function
                                     />
-                                </View>
-                            </View>
+                                ))}
+                            </ScrollView>
 
-                            <View style={{
-                                paddingHorizontal: 20,
-                                marginTop: -10,
-                                paddingBottom: 10,
-                            }}>
-                                <TouchableOpacity style={{
-                                    backgroundColor: COLORS.secondaryWhite,
-                                    width: 120,
-                                    height: 35,
-                                    borderRadius: 10
-                                }} >
-                                    <Text style={{
-                                        paddingHorizontal: 30,
-                                        paddingVertical: 8
-                                    }}>
-                                        Buy Now
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
 
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
-                            showsVerticalScrollIndicator={false}>
-                            <View style={{
-                                flexDirection: 'row', marginHorizontal: 25,
-                                marginVertical: 25
-                            }}>
-                                <TouchableOpacity style={{
-                                    height: 32,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: 100,
-                                    borderColor: COLORS.black,
-                                    borderWidth: 1,
-                                    borderRadius: 20,
-                                    paddingHorizontal: 5,
-                                    marginHorizontal: 12
-                                }}>
-                                    <Text >
-                                        Laptops
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={{
-                                    height: 32,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: 100,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    borderRadius: 50,
-                                    paddingHorizontal: 5,
-                                    // marginHorizontal: 12
-                                }}>
-                                    <Text>
-                                        Computer
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={{
-                                    height: 32,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: 100,
-                                    borderColor: COLORS.gray,
-                                    borderWidth: 1,
-                                    borderRadius: 50,
-                                    paddingHorizontal: 5,
-                                    marginHorizontal: 12
-                                }}>
-                                    <Text  >
-                                        Accessories
-                                    </Text>
-                                </TouchableOpacity>
-
-                            </View>
-                        </ScrollView>
+                        {/* Popular products */}
 
                         <View style={{
                             marginHorizontal: 22,
@@ -239,7 +133,7 @@ const Home = ({ navigation }) => {
                             alignItems: 'center',
                             justifyContent: "space-between",
                             height: 48,
-                            // marginVertical: 22,
+                            marginVertical: 22,
                             borderRadius: 20,
                         }}>
                             <Text style={{
@@ -271,8 +165,6 @@ const Home = ({ navigation }) => {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Popular products */}
-
                         <View style={{
                             flexDirection: 'row',
                             justifyContent: 'space-around',
@@ -282,16 +174,43 @@ const Home = ({ navigation }) => {
                         }}>
 
                             {isLoading ? (
-                                <SkeletonCard />
-                            ) :
-                                (
-                                    currentProducts.map((product) => (
-                                        <Product />
-                                    ))
-
-                                )}
+                                <View style={{
+                                    flexDirection: 'row',
+                                    marginVertical: 25,
+                                    marginHorizontal: 10
+                                }}>
+                                    {Array.from({ length: currentProducts.length }, (_, i) => (
+                                        <SkeletonCard key={i} />
+                                    ))}
+                                </View>
+                            ) : (
+                                currentProducts.map((product) => (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.navigate('SingleProduct', { productId: product._id });
+                                        }}
+                                        key={product._id}>
+                                        <Card style={{
+                                            height: 'auto',
+                                            width: 150,
+                                            marginHorizontal: 10,
+                                            marginBottom: 2
+                                        }}>
+                                            <Card.Cover source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
+                                                style={{
+                                                    height: 90,
+                                                    width: 150
+                                                }} />
+                                            <Card.Title title={product.name} />
+                                            <Card.Content>
+                                                <Text variant="titleLarge" style={{ ...FONTS.body4 }}>₹ {product.price}</Text>
+                                            </Card.Content>
+                                        </Card>
+                                    </TouchableOpacity>
+                                ))
+                            )
+                            }
                         </View>
-
                     </View>
                 </ScrollView>
             </PageContainer >

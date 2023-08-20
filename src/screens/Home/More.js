@@ -1,13 +1,43 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import PageContainer from '../../components/PageContainer'
 import { COLORS, FONTS, images } from '../../../constants'
 import { AntDesign, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { getUserData } from '../auth/Storage'
+import axios from 'axios'
 
 const More = ({ navigation }) => {
+
+    const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const user = await getUserData();
+            if (user) {
+                setUserData(user);
+                console.log("This is the userData:")
+                console.log("Avatar URL:", userData);
+
+            }
+        }
+
+        fetchUserData();
+    }, []);
+
+    const Logout = async () => {
+        try {
+            const response = await axios.post('http://192.168.42.184:5000/logout')
+            if (response.status === 200) {
+                console.log('Logged out successfully');
+            }
+        } catch (error) {
+            console.log('Logout error:', error)
+        }
+    }
+
     return (
-        <SafeAreaView style={{flex:1}}> 
+        <SafeAreaView style={{ flex: 1 }}>
             <PageContainer>
                 <View style={{
                     flexDirection: "row",
@@ -35,21 +65,24 @@ const More = ({ navigation }) => {
                         alignItems: "center",
                         justifyContent: "center"
                     }}>
-                        <Image source={images.user4} style={{
-                            width: 60,
-                            height: 60,
-                            borderRadius: 100,
-                            marginVertical: 48
-                        }} />
+                        {userData && userData.avatar && (
+                            <Image source={{ uri: userData.avatar.url }} style={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: 100,
+                                marginVertical: 48
+                            }} />
+                        )}
                     </View>
+
+
                     <View style={{
                         flexDirection: "column",
                         marginHorizontal: 22
                     }}>
                         <Text style={{ ...FONTS.h4, marginVertical: 6 }}>
-                            Mr.Mukesh
+                            {userData?.fname} {userData?.lname}
                         </Text>
-                        <Text style={{ ...FONTS.body3, color: COLORS.gray }}> 2356489423 </Text>
                     </View>
 
                     <TouchableOpacity onPress={() => {
@@ -85,33 +118,6 @@ const More = ({ navigation }) => {
                             color={COLORS.black} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        console.log("presser")
-                    }}
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginHorizontal: 22,
-                            paddingVertical: 12
-                        }}
-                    >
-                        <View style={{
-                            flexDirection: "row",
-                            alignItems: "center"
-                        }}>
-                            <Ionicons
-                                name='chatbubble-ellipses-outline'
-                                size={24}
-                                color={COLORS.black} />
-                            <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                Chat
-                            </Text>
-                        </View>
-                        <MaterialIcons
-                            name='keyboard-arrow-right'
-                            size={24}
-                            color={COLORS.black} />
-                    </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => {
                         console.log("presser")
@@ -194,59 +200,6 @@ const More = ({ navigation }) => {
                             color={COLORS.black} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        console.log("presser")
-                    }}
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginHorizontal: 22,
-                            paddingVertical: 12
-                        }}
-                    >
-                        <View style={{
-                            flexDirection: "row",
-                            alignItems: "center"
-                        }}>
-                            <AntDesign name='folder1'
-                                size={24}
-                                color={COLORS.black} />
-                            <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                Data usage
-                            </Text>
-                        </View>
-                        <MaterialIcons
-                            name='keyboard-arrow-right'
-                            size={24}
-                            color={COLORS.black} />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => {
-                        console.log("presser")
-                    }}
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginHorizontal: 22,
-                            paddingVertical: 12
-                        }}
-                    >
-                        <View style={{
-                            flexDirection: "row",
-                            alignItems: "center"
-                        }}>
-                            <Ionicons name='help-circle-outline'
-                                size={24}
-                                color={COLORS.black} />
-                            <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                Help
-                            </Text>
-                        </View>
-                        <MaterialIcons
-                            name='keyboard-arrow-right'
-                            size={24}
-                            color={COLORS.black} />
-                    </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => {
                         console.log("presser")
@@ -275,9 +228,7 @@ const More = ({ navigation }) => {
                             color={COLORS.black} />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        console.log("presser")
-                    }}
+                    <TouchableOpacity onPress={Logout}
                         style={{
                             flexDirection: "row",
                             justifyContent: "center",
