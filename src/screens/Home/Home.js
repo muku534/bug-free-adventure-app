@@ -9,9 +9,9 @@ import {
     Image,
     StyleSheet,
 } from 'react-native';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, DrawerActions } from '@react-navigation/native';
-import { COLORS, FONTS, images, SIZES } from '../../../constants';
+import { COLORS, FONTS, icons, images, SIZES } from '../../../constants';
 import PageContainer from '../../components/PageContainer';
 import { ScrollView } from 'react-native';
 import Button from '../../components/Button';
@@ -34,7 +34,7 @@ const Home = ({ navigation }) => {
 
     const getProduct = async () => {
         try {
-            const response = await axios.get('http://192.168.42.184:5000/getProducts')
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getProducts`)
             setProducts(response.data.Products);
             setLoading(false)
             // console.log(Res.data)
@@ -57,6 +57,16 @@ const Home = ({ navigation }) => {
 
     const categories = ['Laptops', 'Computers', 'Accessories'] // List of categories
 
+    const getCategoryImage = (category) => {
+        const imageMapping = {
+            'Laptops': (icons.Laptops), // Update with actual image paths
+            'Computers': (icons.Computers),
+            'Accessories': (icons.Accessories),
+            // Add more categories and image paths as needed
+        };
+        return imageMapping[category] || null;
+    };
+
     const handleCategoryPress = (Category) => {
         // Use the navigate function to navigate to the desired screen
         nav.navigate(Category); // screen names match the category names
@@ -77,7 +87,7 @@ const Home = ({ navigation }) => {
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                marginHorizontal: 22,
+                                marginHorizontal: 18,
                                 marginTop: 35,
                             }}
                         >
@@ -95,8 +105,10 @@ const Home = ({ navigation }) => {
 
                             <Text style={{ ...FONTS.h4 }}>SCS</Text>
 
-                            <TouchableOpacity>
-                                <Ionicons name="ios-search-outline" size={28} color={COLORS.black} />
+                            <TouchableOpacity onPress={() => navigation.navigate("Wishlist")}>
+                                <AntDesign name='hearto'
+                                    size={24}
+                                    style={{ color: COLORS.secondaryBlack }} />
                             </TouchableOpacity>
                         </View>
 
@@ -106,10 +118,8 @@ const Home = ({ navigation }) => {
                         {/* Categories Section */}
                         <View style={{
                             flexDirection: 'row',
-                            marginHorizontal: 25,
-                            marginVertical: 5
+                            marginHorizontal: 10,
                         }}>
-                            {/* Display category buttons using a horizontal ScrollView */}
                             <ScrollView
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
@@ -118,11 +128,11 @@ const Home = ({ navigation }) => {
                                     <CategoryButton
                                         key={index}
                                         title={category}
-                                        onPress={() => handleCategoryPress(category)} // Pass the category to the function
+                                        imageSource={getCategoryImage(category)}
+                                        onPress={() => handleCategoryPress(category)}
                                     />
                                 ))}
                             </ScrollView>
-
                         </View>
 
                         {/* Popular products */}
@@ -133,7 +143,7 @@ const Home = ({ navigation }) => {
                             alignItems: 'center',
                             justifyContent: "space-between",
                             height: 48,
-                            marginVertical: 22,
+                            marginVertical: 12,
                             borderRadius: 20,
                         }}>
                             <Text style={{
@@ -167,10 +177,9 @@ const Home = ({ navigation }) => {
 
                         <View style={{
                             flexDirection: 'row',
-                            justifyContent: 'space-around',
+                            justifyContent: 'space-evenly',
                             alignItems: 'center',
-                            marginHorizontal: 10
-
+                            marginHorizontal: 10,
                         }}>
 
                             {isLoading ? (
@@ -189,23 +198,68 @@ const Home = ({ navigation }) => {
                                         onPress={() => {
                                             navigation.navigate('SingleProduct', { productId: product._id });
                                         }}
-                                        key={product._id}>
-                                        <Card style={{
-                                            height: 'auto',
+                                        key={product._id}
+                                    >
+                                        <View style={{
+                                            height: 205,
                                             width: 150,
                                             marginHorizontal: 10,
-                                            marginBottom: 2
+                                            marginBottom: 2,
+                                            paddingBottom: 20,
+                                            backgroundColor: COLORS.lightgray,
+                                            borderRadius: 15,
+                                            shadowColor: COLORS.secondaryBlack,
+                                            shadowOffset: {
+                                                width: 0,
+                                                height: 2,
+                                            },
+                                            shadowOpacity: 0.25,
+                                            shadowRadius: 3.84,
+                                            elevation: 5,
+                                            marginBottom: 20
                                         }}>
-                                            <Card.Cover source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
+                                            <Image source={images.dims}
                                                 style={{
-                                                    height: 90,
+                                                    height: 100,
                                                     width: 150
                                                 }} />
-                                            <Card.Title title={product.name} />
-                                            <Card.Content>
-                                                <Text variant="titleLarge" style={{ ...FONTS.body4 }}>₹ {product.price}</Text>
-                                            </Card.Content>
-                                        </Card>
+
+                                            <View style={{
+                                                backgroundColor: COLORS.tertiaryWhite, justifyContent: 'center',
+                                                borderRadius: 15,
+                                                marginVertical: 5,
+                                                marginHorizontal: 5,
+                                                height: 'auto',
+                                                paddingHorizontal: 5,
+                                                paddingTop: 10,
+                                                // paddingVertical: 5,
+                                            }}>
+                                                <Text style={{ lineHeight: 20, ...FONTS.body4, fontWeight: 'bold' }}>
+                                                    {product.name}
+                                                </Text>
+
+                                                <View style={{
+                                                    justifyContent: 'space-between', flexDirection: 'row',
+                                                    paddingTop: 13,
+                                                    paddingVertical: 2
+                                                }}>
+                                                    <Text variant="titleLarge" style={{
+                                                        ...FONTS.body4, fontWeight: 'bold',
+                                                    }}>₹ {product.price}</Text>
+
+                                                    <View style={{
+                                                        backgroundColor: COLORS.lightgray,
+                                                        height: 30,
+                                                        width: 30,
+                                                        borderRadius: 8
+                                                    }}>
+                                                        <MaterialIcons name='keyboard-arrow-right'
+                                                            size={28}
+                                                            style={{ color: COLORS.primaryBlue }} />
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
                                     </TouchableOpacity>
                                 ))
                             )
@@ -218,5 +272,8 @@ const Home = ({ navigation }) => {
     )
 }
 
+const styles = StyleSheet.create({
+
+});
 
 export default Home

@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { COLORS, FONTS } from '../../constants';
-import { Chat, Contact, More, Profile, Welcome, Home } from '../screens';
+import { Chat, Contact, More, Profile, Welcome, Home, Cart } from '../screens';
 import { FontAwesome, Feather, Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import DrawerNavigator from './DrawerNavigator';
 
@@ -57,7 +57,7 @@ const BottomTabNavigation = () => {
       />
       <Tab.Screen
         name='Cart'
-        component={Profile}
+        component={Cart}
         options={{
           tabBarIcon: ({ focused }) => {
             return (

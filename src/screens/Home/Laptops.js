@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
+import { View, FlatList, TouchableOpacity, SafeAreaView, TextInput, Image } from 'react-native';
 import { COLORS, FONTS, images, SIZES } from '../../../constants';
 import { Card, Text } from 'react-native-paper';
 import PageContainer from '../../components/PageContainer';
@@ -17,7 +17,7 @@ const Laptops = ({ navigation }) => {
     const getProducts = async () => {
         try {
 
-            const response = await axios.get('http://192.168.42.7:5000/getProducts')
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/getProducts`)
             setProducts(response.data.Products);
             setLoading(false);
             console.log('all products get sucessfully')
@@ -35,11 +35,6 @@ const Laptops = ({ navigation }) => {
     const skeletonCount = 10; // Set the number of skeleton cards
     const cardsPerRow = 2; // Number of skeleton cards per row
 
-
-
-
-
-
     const renderProducts = ({ item }) => (
 
         <TouchableOpacity
@@ -55,22 +50,69 @@ const Laptops = ({ navigation }) => {
                 marginVertical: 5
             }}
         >
-            <Card style={{
-                height: 'auto',
-                width: '90%',
+            <View style={{
+                height: 205,
+                width: 150,
                 marginHorizontal: 10,
-                marginBottom: 2
+                marginBottom: 2,
+                paddingBottom: 20,
+                backgroundColor: COLORS.lightgray,
+                borderRadius: 15,
+                shadowColor: COLORS.black,
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5
             }}>
-                <Card.Cover source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
+                <Image source={images.dims}
                     style={{
-                        height: 90,
-                        width: "100%"
+                        height: 100,
+                        width: 150
                     }} />
-                <Card.Title title={item.name} />
-                <Card.Content>
-                    <Text variant="titleLarge" style={{ ...FONTS.body4 }}>₹ {item.price}</Text>
-                </Card.Content>
-            </Card>
+
+                <View style={{
+                    backgroundColor: COLORS.tertiaryWhite, justifyContent: 'center',
+                    borderRadius: 15,
+                    marginVertical: 5,
+                    marginHorizontal: 5,
+                    height: 'auto',
+                    paddingHorizontal: 5,
+                    paddingTop: 10,
+                    // paddingVertical: 2,
+                }}>
+
+                    <Text style={{
+                        lineHeight: 20,
+                        ...FONTS.body4,
+                        fontWeight: 'bold'
+                    }}  >{item.name} </Text>
+
+                    <View style={{
+                        justifyContent: 'space-between', flexDirection: 'row',
+                        paddingTop: 13,
+                        paddingVertical: 2
+                    }}>
+
+                        <Text variant="titleLarge" style={{
+                            ...FONTS.body4, fontWeight: 'bold',
+                        }}>₹ {item.price}</Text>
+
+                        <View style={{
+                            backgroundColor: COLORS.lightgray,
+                            height: 30,
+                            width: 30,
+                            borderRadius: 8
+                        }}>
+                            <MaterialIcons name='keyboard-arrow-right'
+                                size={28}
+                                style={{ color: COLORS.secondaryBlack }} />
+                        </View>
+                    </View>
+                </View>
+            </View>
         </TouchableOpacity>
 
     )
@@ -85,8 +127,9 @@ const Laptops = ({ navigation }) => {
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
+                                justifyContent: 'space-between',
                                 marginHorizontal: 22,
-                                marginTop: 35,
+                                marginTop: 40,
                                 paddingBottom: 10
                             }}
                         >
@@ -97,6 +140,11 @@ const Laptops = ({ navigation }) => {
                                     style={{ color: COLORS.secondaryBlack }} />
                             </TouchableOpacity>
                             <Text style={{ ...FONTS.h4 }}>Laptops</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("Wishlist")}>
+                                <AntDesign name='hearto'
+                                    size={24}
+                                    style={{ color: COLORS.secondaryBlack }} />
+                            </TouchableOpacity>
                         </View>
 
                         <View
@@ -108,7 +156,7 @@ const Laptops = ({ navigation }) => {
                                 height: 48,
                                 marginVertical: 22,
                                 paddingHorizontal: 12,
-                                borderRadius: 20,
+                                borderRadius: 10,
                             }}
                         >
                             <Ionicons name="ios-search-outline" size={24} color={COLORS.black} />

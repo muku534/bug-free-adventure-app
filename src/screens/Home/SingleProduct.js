@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Image, SafeAreaView, View, Text, TouchableOpacity } from 'react-native'
+import { Image, SafeAreaView, View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import PageContainer from '../../components/PageContainer'
+import PageTitle from '../../components/PageTitle';
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, images, SIZES } from '../../../constants';
 import { useRoute } from '@react-navigation/native';
@@ -16,11 +17,14 @@ const SingleProduct = ({ navigation }) => {
     const [cart, setCart] = useState([]);
     const [price, setPrice] = useState(product.price);
     const [quantity, setQuantity] = useState(1);
+    const [wishlist, setWishlist] = useState([]);
+    const [userData, setUserData] = useState(null);
+
 
     const getProductDetail = async () => {
 
         try {
-            const response = await axios.get(`http://192.168.42.184:5000/ProductDetails/${productId}`)
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/ProductDetails/${productId}`)
             setProduct(response.data.getSingleProducts);
             console.log('product get sucessfully',)
             setLoading(false);
@@ -30,6 +34,10 @@ const SingleProduct = ({ navigation }) => {
         }
     };
 
+    useEffect(() => {
+        getProductDetail();
+    }, []);
+
 
     const addToCart = async () => {
         try {
@@ -37,7 +45,7 @@ const SingleProduct = ({ navigation }) => {
                 console.log('Please log in first.');
                 navigation.navigate('Login');
             } else {
-                const response = await axios.post('http://192.168.42.184:5000/add-to-cart', {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/add-to-cart`, {
                     product: product._id,
                     quantity,
                     price: product.price
@@ -45,6 +53,8 @@ const SingleProduct = ({ navigation }) => {
                 setCart([...cart, response.data.cartItem]);
                 setPrice(response.data.price)
                 console.log(response.data.message);
+                //passing the updated cart item to the cart screen
+                navigation.navigate('Cart', { updatedCartItem: response.data.cartItem })
             }
         } catch (error) {
             console.log('Error to add the product in to cart:', error.message)
@@ -52,140 +62,178 @@ const SingleProduct = ({ navigation }) => {
     }
 
 
-    useEffect(() => {
-        getProductDetail();
-    }, []);
-
-    // const [userData, setUserData] = useState(null);
-
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         const user = await getUserData();
-    //         if (user) {
-    //             setUserData(user);
-    //             console.log("This is the userData:")
-    //             console.log("Avatar URL:", userData?.avatar?.url);
-    //         }
-    //     }
-
-    //     fetchUserData();
-    // }, []);
-
-
-    const addToWhishList = async () => {
+    const addToWishList = async () => {
         try {
             if (userData && userData.isAuth) {
                 console.log('Please log in first.');
                 navigation.navigate('Login')
             } else {
-                const response = await axios.post('http://192.168.42.184:5000/whishlist', {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/wishlist`, {
                     product: product._id,
+                    price: product.price
                 });
-                console.log(response.data.message);
+                setWishlist(response.data.wishlist)
+                console.log(response.data);
             }
         } catch (error) {
-            console.log('Error adding product to whishlist', error.message)
+            console.log('Error adding product to wishlist', error.message)
         }
     }
 
     return (
         <SafeAreaView>
             <PageContainer>
-                <View style={{ flex: 1 }}>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            marginHorizontal: 22,
-                            marginTop: 35,
-                            paddingBottom: 10
-                        }}
-                    >
-                        <TouchableOpacity onPress={() => navigation.navigate("Home")}
-                            style={{ marginLeft: -10 }} >
-                            <MaterialIcons name='keyboard-arrow-left'
-                                size={28}
-                                style={{ color: COLORS.secondaryBlack }} />
-                        </TouchableOpacity>
-                        <Text style={{ ...FONTS.h4 }}>Product Details</Text>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Image
-                            source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
-                            resizeMode="contain"
+                <PageTitle title="Product Details" onPress={() => navigation.navigate('Home')} />
+                <ScrollView>
+                    <View style={{ flex: 1 }}>
+                        <View
                             style={{
-                                height: 250,
-                                width: 300,
+                                flexDirection: 'row',
+                                justifyContent: 'center',
                             }}
-                            onError={(error) => console.log('Image loading error:', error)}
-                        />
+                        >
+                            <Image
+                                source={{ uri: 'https://mdbcdn.b-cdn.net/img/Photos/Horizontal/E-commerce/Products/4.webp' }}
+                                resizeMode="contain"
+                                style={{
+                                    height: 250,
+                                    width: 330,
+                                }}
+                                onError={(error) => console.log('Image loading error:', error)}
+                            />
 
-                        <View>
-                            <TouchableOpacity onPress={addToWhishList} >
-                                <AntDesign name='hearto'
-                                    size={28}
-                                    style={{ color: COLORS.secondaryBlack }} />
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <AntDesign name='sharealt' size={28}
-                                    style={{ color: COLORS.secondaryBlack, marginVertical: 35 }} />
-                            </TouchableOpacity>
+                            <View style={{ marginVertical: 40 }}>
+                                <TouchableOpacity onPress={addToWishList} >
+                                    <AntDesign name='hearto'
+                                        size={28}
+                                        style={{ color: COLORS.secondaryBlack }} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </View>
-
-                    <View style={{
-                        backgroundColor: COLORS.secondaryWhite,
-                        borderTopLeftRadius: 25,
-                        borderTopRightRadius: 25,
-                        height: '60%',
-                        width: '100%',
-                        shadowColor: COLORS.secondaryBlack,
-                        shadowOffset: {
-                            width: 0,
-                            height: 3,
-                        },
-                        shadowOpacity: 0.27,
-                        shadowRadius: 4.65,
-                        elevation: 6
-                    }}>
 
                         <View style={{
-                            color: COLORS.secondaryBlack,
-                            paddingHorizontal: 22,
-                            marginVertical: 22
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: 10
                         }}>
-                            <Text style={{ ...FONTS.h2, paddingBottom: 10 }}>
-                                {product.name}
-                            </Text>
+                            <View style={{
+                                backgroundColor: COLORS.lightgray,
+                                height: 60,
+                                width: 65,
+                                borderRadius: 10,
+                                marginHorizontal: 8
+                            }}>
+                                <Image
+                                    source={images.dims}
+                                    resizeMode="contain"
+                                    style={{
+                                        height: 60,
+                                        width: 65,
+                                    }}
+                                    onError={(error) => console.log('Image loading error:', error)}
+                                />
+                            </View>
+                            <View style={{
+                                backgroundColor: COLORS.lightgray,
+                                height: 60,
+                                width: 65,
+                                borderRadius: 10,
+                                marginHorizontal: 8
+                            }}>
+                                <Image
+                                    source={images.dims}
+                                    resizeMode="contain"
+                                    style={{
+                                        height: 60,
+                                        width: 65,
+                                    }}
+                                    onError={(error) => console.log('Image loading error:', error)}
+                                />
+                            </View>
+                            <View style={{
+                                backgroundColor: COLORS.lightgray,
+                                height: 60,
+                                width: 65,
+                                borderRadius: 10,
+                                marginHorizontal: 8
+                            }}>
+                                <Image
+                                    source={images.dims}
+                                    resizeMode="contain"
+                                    style={{
+                                        height: 60,
+                                        width: 65,
+                                    }}
+                                    onError={(error) => console.log('Image loading error:', error)}
+                                />
+                            </View>
 
-                            <Text style={{ ...FONTS.h4, marginVertical: 15, paddingBottom: 10 }}>
-                                Lenovo Flex - 3 Core i5 12th Gen - (16 GB/512 GB SSD/Windows 11 Home/4 GB Graphics/NVIDIA GeForce RTX 3050) AN515-58 Gaming Laptop  (15.6 inch, Shale Black, 2.5 kg)
-                            </Text>
-
-                            <Text style={{ ...FONTS.h4, marginVertical: 15, paddingTop: 15 }}>
-                                ₹{product.price}
-                            </Text>
                         </View>
 
-                        <TouchableOpacity onPress={addToCart}>
+                        <View style={{
+                            backgroundColor: COLORS.secondaryWhite,
+                            borderTopLeftRadius: 25,
+                            borderTopRightRadius: 25,
+                            height: '100%',
+                            width: 'auto',
+                            shadowColor: COLORS.black,
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.85,
+                            elevation: 5,
+                            marginVertical: 15
+                        }}>
+
                             <View style={{
-                                backgroundColor: COLORS.secondaryPrimary,
-                                justifyContent: 'center',
-                                alignItems: 'center',
+                                color: COLORS.secondaryBlack,
+                                paddingHorizontal: 22,
+                                marginVertical: 22
                             }}>
-                                <Text style={{ ...FONTS.body3 }}>
-                                    Add To Cart
+                                <Text style={{ ...FONTS.h2, paddingBottom: 10 }}>
+                                    {product.name}
                                 </Text>
+
+                                <Text style={{
+                                    ...FONTS.body3,
+                                    fontWeight: 'bold',
+                                    marginVertical: 15,
+                                    paddingBottom: 10,
+                                    color: COLORS.secondaryGray
+                                }}>
+                                    {product.description}
+                                    {product.description}
+                                    {product.description}
+                                </Text>
+
                             </View>
-                        </TouchableOpacity>
+
+
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                                <Text style={{ ...FONTS.h4, paddingTop: 15 }}>
+                                    ₹ {product.price}
+                                </Text>
+                                <TouchableOpacity onPress={addToCart}>
+                                    <View style={{
+                                        backgroundColor: COLORS.primaryBlue,
+                                        paddingHorizontal: 52,
+                                        paddingVertical: 15,
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        borderRadius: 10
+                                    }}>
+                                        <Text style={{ ...FONTS.body3, color: COLORS.secondaryWhite, }}>
+                                            Add To Cart
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                     </View>
-                </View>
+                </ScrollView>
             </PageContainer>
         </SafeAreaView >
     )

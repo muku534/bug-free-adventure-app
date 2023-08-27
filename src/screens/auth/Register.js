@@ -5,14 +5,39 @@ import COLORS from '../../../constants/colors';
 import { Ionicons } from "@expo/vector-icons";
 // import Checkbox from "expo-checkbox"
 import Button from '../../components/Button';
+import axios from 'axios';
+
 
 const Signup = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [fname, setFname] = useState('');
+    const [lname, setLname] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const SignUp = async () => {
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/signup`, {
+                fname, lname, email, password
+            });
+
+            if (response.data.message === "Successfully Registered, Please login now.") {
+                console.log('SignUp Successful:', response.data.message);
+                navigation.navigate('Login');
+            } else {
+                console.log('Sign Up failed:', response.data.message);
+            }
+        } catch (error) {
+            console.log('Error to Signup:', error.message);
+        }
+    }
+
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ flex: 1, marginHorizontal: 22 }}>
-                <View style={{ marginVertical: 22 }}>
+                <View style={{ marginVertical: 5 }}>
                     <Text style={{
                         fontSize: 22,
                         fontWeight: 'bold',
@@ -33,7 +58,65 @@ const Signup = ({ navigation }) => {
                         fontSize: 16,
                         fontWeight: '400',
                         marginVertical: 8
-                    }}>Email address</Text>
+                    }}>First Name</Text>
+
+                    <View style={{
+                        width: "100%",
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: 22
+                    }}>
+                        <TextInput
+                            placeholder='Enter your First Name'
+                            placeholderTextColor={COLORS.black}
+                            keyboardType='default'
+                            style={{
+                                width: "100%"
+                            }}
+                            value={fname}
+                            onChangeText={setFname}
+                        />
+                    </View>
+                </View>
+                <View style={{ marginBottom: 12 }}>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: '400',
+                        marginVertical: 8
+                    }}>Last Name</Text>
+
+                    <View style={{
+                        width: "100%",
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingLeft: 22
+                    }}>
+                        <TextInput
+                            placeholder='Enter your Last Name'
+                            placeholderTextColor={COLORS.black}
+                            keyboardType='default'
+                            style={{
+                                width: "100%"
+                            }}
+                            value={lname}
+                            onChangeText={setLname}
+                        />
+                    </View>
+                </View>
+                <View style={{ marginBottom: 12 }}>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: '400',
+                        marginVertical: 8
+                    }}>Email Address</Text>
 
                     <View style={{
                         width: "100%",
@@ -52,11 +135,13 @@ const Signup = ({ navigation }) => {
                             style={{
                                 width: "100%"
                             }}
+                            value={email}
+                            onChangeText={setEmail}
                         />
                     </View>
                 </View>
 
-                <View style={{ marginBottom: 12 }}>
+                {/* <View style={{ marginBottom: 12 }}>
                     <Text style={{
                         fontSize: 16,
                         fontWeight: '400',
@@ -95,7 +180,7 @@ const Signup = ({ navigation }) => {
                             }}
                         />
                     </View>
-                </View>
+                </View> */}
 
                 <View style={{ marginBottom: 12 }}>
                     <Text style={{
@@ -121,6 +206,8 @@ const Signup = ({ navigation }) => {
                             style={{
                                 width: "100%"
                             }}
+                            value={password}
+                            onChangeText={setPassword}
                         />
 
                         <TouchableOpacity
@@ -159,13 +246,14 @@ const Signup = ({ navigation }) => {
                 <Button
                     title="Sign Up"
                     filled
+                    onPress={SignUp}
                     style={{
                         marginTop: 18,
                         marginBottom: 4,
                     }}
                 />
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 15 }}>
                     <View
                         style={{
                             flex: 1,
@@ -247,7 +335,7 @@ const Signup = ({ navigation }) => {
                 <View style={{
                     flexDirection: "row",
                     justifyContent: "center",
-                    marginVertical: 22
+                    marginVertical: 15
                 }}>
                     <Text style={{ fontSize: 16, color: COLORS.black }}>Already have an account</Text>
                     <Pressable

@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Image, SafeAreaView, View, Text, FlatList } from 'react-native';
+import { Image, SafeAreaView, View, Text, FlatList, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-import { FONTS } from '../../../constants';
+import { FONTS, COLORS, images } from '../../../constants';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import PageContainer from '../../components/PageContainer';
+import PageTitle from '../../components/PageTitle';
 
-const Wishlist = () => {
-    const [wishlistItems, setWishlistItems] = useState([]);
+const Wishlist = ({ navigation }) => {
+    const [wishlist, setWishlist] = useState([]);
 
     const getWishlistDetails = async () => {
         try {
-            const response = await axios.get('http://192.168.42.184:5000/whishlist');
-            setWishlistItems(response.data.wishlistItems);
-            console.log(response.data.wishlistItems);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/wishlist`);
+            setWishlist(response.data.wishlist);
+            console.log(response.data.wishlist);
         } catch (error) {
             console.log('Error fetching wishlist items:', error.message);
         }
@@ -20,41 +23,70 @@ const Wishlist = () => {
         getWishlistDetails();
     }, []);
 
-    const renderWishlistItem = ({ item }) => (
+    const renderWishlist = ({ item }) => (
         <View style={{
-            flex: 1,
-            marginVertical: 10,
-            width: '50%',
-            paddingHorizontal: 5,
-            marginVertical: 5
+            marginVertical: 20,
+            backgroundColor: COLORS.tertiaryWhite,
+            borderRadius: 15,
+            marginHorizontal: 15,
+            shadowColor: COLORS.black,
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5
         }}>
-            <Image
-                source={{ uri: item.product.images[0].url }}
-                resizeMode="cover"
-                style={{
-                    height: 150,
-                    width: 150,
-                }}
-            />
-            <Text style={{ ...FONTS.h4 }}>
-                {item.product.name}
-            </Text>
-            <Text style={{ ...FONTS.body4 }}>
-                Price: ₹{item.product.price}
-            </Text>
+            <View style={{
+                flex: 1,
+                flexDirection: 'row',
+                marginVertical: 10,
+                width: '50%',
+                paddingHorizontal: 5,
+                marginVertical: 5,
+            }}>
+                <Image
+                    source={images.dims}
+                    resizeMode="cover"
+                    style={{
+                        height: 80,
+                        width: 80,
+                    }}
+                />
+                <Text style={{ ...FONTS.body4, paddingVertical: 15, marginHorizontal: 15 }}>
+                    {item.product.name}
+                </Text>
+                <View style={{
+                    marginHorizontal: 10,
+                    marginVertical: 15
+                }}>
+                    <Text style={{ ...FONTS.body4 }}>
+                        Price: ₹{item.product.price}
+                    </Text>
+
+                </View>
+            </View>
         </View>
     );
 
     return (
         <SafeAreaView>
-            <FlatList
-                data={wishlistItems}
-                keyExtractor={(item) => item._id}
-                renderItem={renderWishlistItem}
-                contentContainerStyle={{
-                    // Add your flatlist's container styling here
-                }}
-            />
+            <PageContainer>
+                <PageTitle title="My Wishlist" onPress={() => navigation.navigate('Home')} />
+                <View style={{ flex: 1 }}>
+                    <View>
+                        <FlatList
+                            data={wishlist}
+                            keyExtractor={(item) => item._id}
+                            renderItem={renderWishlist}
+                            contentContainerStyle={{
+                                // Add your flatlist's container styling here
+                            }}
+                        />
+                    </View>
+                </View>
+            </PageContainer>
         </SafeAreaView>
     )
 }

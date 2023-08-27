@@ -1,166 +1,137 @@
-import { View, Text, TouchableOpacity, Modal, TextInput, Image, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useEffect } from 'react';
-// import ImagePicker from 'react-native-image-picker';
-import * as ImagePicker from 'expo-image-picker';
 import PageContainer from '../../components/PageContainer';
 import PageTitle from '../../components/PageTitle';
 import { COLORS, FONTS, SIZES, } from '../../../constants';
-import { AntDesign } from '@expo/vector-icons';
 import Button from '../../components/Button';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import { getUserData } from '../auth/Storage';
+import { useRoute } from '@react-navigation/native';
+import axios from 'axios';
+import { useStripe } from '@stripe/stripe-react-native';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
-const AddProfile = ({ navigation }) => {
+const Checkout = ({ navigation }) => {
+
+    const route = useRoute();
+    const totalCartPrice = route.params.totalCartPrice;
+
     const [userData, setUserData] = useState(null);
-    const [showMenu, setShowMenu] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [viewProfileModalVisible, setViewProfileModalVisible] = useState(false);
+    const [fname, setFname] = useState('');
+    const [lname, setLnane] = useState('');
+    const [email, setEmail] = useState('');
+    const [address, setAddress] = useState('');
+    const [phoneNimber, setPhoneNumber] = useState('');
 
-    const toggleMenu = () => {
-        setShowMenu(!showMenu);
-    };
 
-    const handleMenuOption = async (option) => {
-        if (option === 'viewProfile') {
-            setViewProfileModalVisible(true);
-        } else if (option === 'removeProfile') {
-            setSelectedImage(null);
-        } if (option === 'changeProfile') {
-            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission denied');
-                return;
-            }
-
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 1,
-            });
-
-            if (!result.canceled) {
-                console.log('Selected image:', result.uri);
-                setSelectedImage(result.uri);
-            }
-        }
-        toggleMenu();
-    };
-
-    const handleSaveProfile = async () => {
-        if (!selectedImage) {
-            Alert.alert('Profile Image Missing', 'Please select a profile image.', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
-            return;
-        }
-    };
 
     useEffect(() => {
         const fetchUserData = async () => {
             const user = await getUserData();
             if (user) {
                 setUserData(user);
+                setFname(user.fname);
+                setFname(user.lname);
+                setEmail(user.email);
+                setAddress(user.address);
+                setPhoneNumber(user.phoneNumber);
                 console.log("This is the userData:")
-                console.log("Avatar URL:", userData?.avatar?.url);
             }
         }
 
         fetchUserData();
     }, []);
 
+    const { confirmPayment } = useStripe();
+
+    const handlePayment = async () => {
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/intents`, {
+                amount: totalCartPrice
+            });
+            const clientSecret = response.data.paymentIntent;
+
+            const result = await confirmPayment(clientSecret, {
+                payment_method: {
+                    card: {
+                        number: '4242424242424242', // Replace with actual card number
+                        exp_month: 12, // Replace with actual expiration month
+                        exp_year: 24, // Replace with actual expiration year
+                        cvc: '123', // Replace with actual CVC
+                    },
+                    paymentMethodType: 'card', // Add this line
+                },
+            });
+
+            if (result.error) {
+                console.log('Payment error', result.error)
+            } else {
+                if (result.paymenIntent.status === ' succeeded') {
+                    console.log('Payment succeeded');
+
+                    // After successful payment, create a new order
+                    const orderData = {
+                        orderItems: [],
+                        itemsPrice: totalCartPrice,
+                        totalPrice: totalCartPrice,
+                        paymentInfo: 'Card Payment',
+                        rootUser: userData,
+                    };
+
+                    try {
+                        const orderResponse = await axios.post(`${process.env.REACT_APP_API_URL}/newOrder`, orderData);
+                        if (orderResponse.data.success) {
+                            console.log('Order created successfully:', orderResponse.data.order);
+                        } else {
+                            console.log('Failed to create order:', orderResponse.data.message);
+                        }
+                    } catch (orderError) {
+                        console.log('Order creation error:', orderError);
+                    }
+                }
+            }
+
+        } catch (error) {
+            console.log('API error:', error)
+        }
+    }
+
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView>
             <PageContainer>
                 <ScrollView>
-                    {/* <PageTitle title="Profile" onPress={() => navigation.navigate('Contact')} /> */}
-
-                    <View style={{ flex: 1, alignItems: 'center' }}>
-                        <Text style={{
-                            ...(SIZES.width <= 360 ?
-                                { ...FONTS.h2 }
-                                : { ...FONTS.h1 }
-                            ),
-                            marginTop: 5,
-                            paddingHorizontal: 12,
-                            fontWeight: '400',
-                            // marginVertical: 8,
-                        }}>
-                            Complete your profile
-                        </Text>
-                        <Text style={{
-                            ...FONTS.body3,
-                            paddingHorizontal: 12,
-                            fontWeight: '400',
-                            // marginVertical: 8,
-                            // color: 'red'
-                        }}>Add a profile photo, name and bio to let people know who you are </Text>
-                        <TouchableOpacity onPress={toggleMenu}>
-                            <View
-                                style={{
-                                    width: 130,
-                                    height: 130,
-                                    marginVertical: 15,
-                                    borderRadius: 100,
-                                    backgroundColor: COLORS.secondaryWhite,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                {selectedImage ? (
-                                    <Image source={{ uri: selectedImage }} style={{ width: 130, height: 130, borderRadius: 100 }} />
-                                ) : (
-                                    <AntDesign name="user" size={64} color="#111" />
-                                )}
-                                <View
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        right: 0,
-                                    }}
-                                >
-                                    <AntDesign name="pluscircle" size={30} color={COLORS.gray} />
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                        {/* Modal to view profile image */}
-                        <Modal visible={viewProfileModalVisible} transparent animationType="fade">
-                            <TouchableOpacity
-                                style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-                                onPress={() => setViewProfileModalVisible(false)}
-                            >
-                                <View style={{ backgroundColor: COLORS.white, borderRadius: 8, padding: 16, width: 250, height: 250 }}>
-                                    {selectedImage ? (
-                                        <Image source={{ uri: selectedImage }} style={{ width: '100%', height: '100%', borderRadius: 8 }} />
-                                    ) : (
-                                        <Text>No profile image selected</Text>
-                                    )}
-                                </View>
+                    <View style={{ flex: 1 }}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginHorizontal: 22,
+                                marginTop: 35,
+                                paddingBottom: 10
+                            }}
+                        >
+                            <TouchableOpacity onPress={() => navigation.navigate("Home")}
+                                style={{ marginLeft: -10 }} >
+                                <MaterialIcons name='keyboard-arrow-left'
+                                    size={28}
+                                    style={{ color: COLORS.secondaryBlack }} />
                             </TouchableOpacity>
-                        </Modal>
-
-                        <Modal visible={showMenu} transparent animationType="fade">
-                            <TouchableOpacity
-                                style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-                                onPress={toggleMenu}
-                            >
-                                <View style={{
-                                    backgroundColor: COLORS.white, borderRadius: 8, padding: 16, width: 250,
-                                    height: 150,
-                                }}>
-                                    <TouchableOpacity style={{ paddingVertical: 8 }} onPress={() => handleMenuOption('viewProfile')}>
-                                        <Text style={{ ...FONTS.body3 }}>View Profile</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{ paddingVertical: 8 }} onPress={() => handleMenuOption('removeProfile')}>
-                                        <Text style={{ ...FONTS.body3 }}>Remove Profile</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={{ paddingVertical: 8 }} onPress={() => handleMenuOption('changeProfile')}>
-                                        <Text style={{ ...FONTS.body3 }}>Change Profile</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableOpacity>
-                        </Modal>
+                            <Text style={{ ...FONTS.h4 }}>Laptops</Text>
+                        </View>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{
+                                ...(SIZES.width <= 360 ?
+                                    { ...FONTS.h2 }
+                                    : { ...FONTS.h1 }
+                                ),
+                                marginTop: 5,
+                                paddingHorizontal: 12,
+                                fontWeight: '400',
+                                // marginVertical: 8,
+                            }}>
+                                Payable amount : {totalCartPrice}
+                            </Text>
+                        </View>
 
                         <View style={{ width: '100%', paddingHorizontal: 22, paddingVertical: 0 }}>
 
@@ -182,9 +153,7 @@ const AddProfile = ({ navigation }) => {
 
                             }}>
                                 <TextInput
-                                    placeholder='example@ Mukesh534'
-                                    placeholderTextColor={COLORS.secondaryGray}
-                                    keyboardType='email-address'
+                                    keyboardType='default'
                                     style={{
                                         width: "100%",
                                         height: 54,
@@ -198,8 +167,11 @@ const AddProfile = ({ navigation }) => {
                                         color: '#111'
                                     }}
                                     value={userData?.fname}
+                                    onChangeText={setFname}
                                 />
+
                             </View>
+
 
                             <Text style={{
                                 fontSize: 16,
@@ -219,9 +191,7 @@ const AddProfile = ({ navigation }) => {
 
                             }}>
                                 <TextInput
-                                    placeholder='Hi there! My name is Mukesh'
-                                    placeholderTextColor={COLORS.secondaryGray}
-                                    keyboardType='email-address'
+                                    keyboardType='default'
                                     style={{
                                         width: "100%",
                                         height: 54,
@@ -235,9 +205,10 @@ const AddProfile = ({ navigation }) => {
                                         color: '#111'
                                     }}
                                     value={userData?.lname}
-
+                                    onChangeText={setLnane}
                                 />
                             </View>
+
 
                             <Text style={{
                                 fontSize: 16,
@@ -273,7 +244,7 @@ const AddProfile = ({ navigation }) => {
                                         color: '#111'
                                     }}
                                     value={userData?.email}
-
+                                    onChangeText={setEmail}
                                 />
                             </View>
                             <Text style={{
@@ -296,7 +267,7 @@ const AddProfile = ({ navigation }) => {
                                 <TextInput
                                     placeholder='Hi there! My name is Mukesh'
                                     placeholderTextColor={COLORS.secondaryGray}
-                                    keyboardType='email-address'
+                                    keyboardType='default'
                                     style={{
                                         width: "100%",
                                         height: 54,
@@ -310,7 +281,7 @@ const AddProfile = ({ navigation }) => {
                                         color: '#111'
                                     }}
                                     value={userData?.address}
-
+                                    onChangeText={setAddress}
                                 />
                             </View>
                             <Text style={{
@@ -347,18 +318,25 @@ const AddProfile = ({ navigation }) => {
                                         color: '#111'
                                     }}
                                     value={userData?.phoneNumber}
+                                    onChangeText={setPhoneNumber}
                                 />
                             </View>
-                            <Button
-                                title="Save"
-                                filled
-                                onPress={handleSaveProfile}
-                                style={{
-                                    marginTop: 15,
-                                    // marginVertical: 55,
-                                    marginBottom: 4,
-                                }}
-                            />
+                            <TouchableOpacity onPress={handlePayment}>
+                                <View style={{
+                                    backgroundColor: COLORS.primaryBlue,
+                                    paddingHorizontal: 52,
+                                    paddingVertical: 15,
+                                    marginVertical: 10,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    borderRadius: 10,
+                                    marginHorizontal: 52
+                                }}>
+                                    <Text style={{ ...FONTS.body3, color: COLORS.secondaryWhite, }}>
+                                        Order
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
@@ -367,4 +345,4 @@ const AddProfile = ({ navigation }) => {
     )
 }
 
-export default AddProfile
+export default Checkout

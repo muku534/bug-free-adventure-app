@@ -6,8 +6,8 @@ import { COLORS, FONTS, SIZES } from '../../constants';
 const PageTitle = (props) => {
     return (
         <View style={styles.pageTitleContainer}>
-            <TouchableOpacity onPress={props.onPress} style={{ marginLeft: -15 }}>
-
+            <TouchableOpacity onPress={props.onPress}
+             style={{ marginLeft: -15 }}>
                 <MaterialIcons name='keyboard-arrow-left' color={COLORS.black} size={SIZES.padding * 3} />
             </TouchableOpacity>
             {
@@ -24,9 +24,18 @@ const PageTitle = (props) => {
 const styles = StyleSheet.create({
     pageTitleContainer: {
         marginHorizontal: 22,
-        marginVertical: 22,
+        // marginVertical: 42,
+        marginTop: 42,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        shadowColor: COLORS.black,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
     }
 })
 

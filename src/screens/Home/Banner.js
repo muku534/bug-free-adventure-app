@@ -6,11 +6,19 @@ const Banner = () => {
     return (
         <View style={{
             backgroundColor: COLORS.primaryBlue,
-            height: 'auto',
+            height: '28%',
             width: 'auto',
             borderRadius: 15,
-            marginHorizontal: 25,
-            marginVertical: 35,
+            marginHorizontal: 20,
+            marginVertical: 20,
+            shadowColor: COLORS.secondaryBlack,
+            shadowOffset: {
+                width: 0,
+                height: 3,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5
         }}>
 
             <Text style={{
@@ -18,13 +26,13 @@ const Banner = () => {
                 alignItems: 'center',
                 ...FONTS.body4,
                 paddingHorizontal: 18,
-                paddingVertical: 10
+                paddingVertical: 15
             }}>
                 Zenbook Duo
             </Text>
 
             <View style={{
-                paddingHorizontal: 18,
+                paddingHorizontal: 15,
                 flexDirection: 'row',
                 justifyContent: 'space-between'
             }}>
@@ -38,13 +46,14 @@ const Banner = () => {
                 </Text>
 
                 <View style={{
-                    marginTop: -35,
+                    marginTop: -30,
                 }}>
                     <Image
                         source={require("../../../assets/images/banner.png")}
+                        resizeMode='cover'
                         style={{
-                            height: 112,
-                            width: 112,
+                            height: 120,
+                            width: 125,
                         }}
                     />
                 </View>
@@ -52,8 +61,8 @@ const Banner = () => {
 
             <View style={{
                 paddingHorizontal: 20,
-                marginTop: -10,
-                paddingBottom: 10,
+                marginTop: -18,
+                // paddingBottom: 5,
             }}>
                 <TouchableOpacity style={{
                     backgroundColor: COLORS.secondaryWhite,

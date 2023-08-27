@@ -10,6 +10,8 @@ const user5 = require('../assets/images/user5.jpg')
 const user6 = require('../assets/images/user6.jpg')
 const user7 = require('../assets/images/user7.jpg')
 const user8 = require('../assets/images/user8.jpg')
+const dims = require('../assets/images/dims.png')
+const CoverImg = require('../assets/drawer-cover.jpeg')
 
 export default {
     illustration,
@@ -24,4 +26,6 @@ export default {
     user7,
     user8,
     usFlag,
+    dims,
+    CoverImg
 }

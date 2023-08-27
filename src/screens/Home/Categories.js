@@ -1,25 +1,62 @@
 import React from 'react';
-import { TouchableOpacity, Text } from 'react-native';
-import { COLORS } from '../../../constants';
+import { TouchableOpacity, Text, View, Image } from 'react-native';
+import { COLORS, icons } from '../../../constants';
 
-const CategoryButton = ({ title, onPress }) => {
+const CategoryButton = ({ title, onPress, imageSource }) => {
     return (
         <TouchableOpacity
             style={{
-                height: 32,
+                height: 'auto',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 100,
-                borderColor: COLORS.black,
-                borderWidth: 1,
-                borderRadius: 20,
-                paddingHorizontal: 5,
-                marginHorizontal: 12,
+                height: 40,
+                width: 'auto',
+                backgroundColor: COLORS.primaryBlue,
+                // borderWidth: 1,
+                borderRadius: 10,
+                // paddingHorizontal: 1,
+                marginHorizontal: 8,
+                marginTop: 10,
+                shadowColor: COLORS.secondaryBlack,
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+                marginBottom:5
             }}
             onPress={onPress} // Call the onPress function from props
         >
-            <Text>{title}</Text>
+            <View style={{
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 5
+            }}>
+                <View style={{
+                    backgroundColor: COLORS.lightgray,
+                    height: 30,
+                    width: 30,
+                    // paddingHorizontal:5,
+                    borderRadius: 5,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+
+                }}>
+                    <Image
+                        source={imageSource}
+                        style={{
+                            height: 25,
+                            width: 25,
+                        }}
+                    />
+                </View>
+                <Text style={{ color: COLORS.secondaryWhite, paddingHorizontal: 5 }}>{title}</Text>
+            </View>
         </TouchableOpacity>
+
     );
 };
 
