@@ -54,6 +54,36 @@ const AddProfile = ({ navigation }) => {
             Alert.alert('Profile Image Missing', 'Please select a profile image.', [{ text: 'OK', onPress: () => console.log('OK Pressed') }]);
             return;
         }
+
+        const fileExtension = selectedImage.split('.').pop(); // Get the file extension
+        const imageType = `image/${fileExtension === 'png' ? 'png' : 'jpeg'}`; // Determine image type
+
+        const updatedProfile = new FormData();
+        updatedProfile.append('fname', userData.fname);
+        updatedProfile.append('lname', userData.lname);
+        updatedProfile.append('email', userData.email);
+        updatedProfile.append('uploadedImage', {
+            uri: selectedImage,
+            type: imageType,
+            name: `profile.${fileExtension}`,
+        });
+
+
+        try {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/updateProfile`, updatedProfile, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.success) {
+                console.log('Profile updated successfully :', response.data.user)
+            } else {
+                console.log('Failed to update profile :', response.data.error)
+            }
+        } catch (error) {
+            console.log('Error updating profile:', error)
+        }
+
     };
 
     useEffect(() => {
@@ -356,7 +386,7 @@ const AddProfile = ({ navigation }) => {
                                 style={{
                                     marginTop: 15,
                                     // marginVertical: 55,
-                                    marginBottom: 4,
+                                    marginBottom: 24,
                                 }}
                             />
                         </View>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native'
 import PageContainer from '../../components/PageContainer'
 import { COLORS, FONTS, images } from '../../../constants'
-import { AntDesign, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { AntDesign, Entypo, Ionicons, MaterialCommunityIcons, MaterialIcons, Feather, Foundation, EvilIcons } from '@expo/vector-icons'
 import { getUserData } from '../auth/Storage'
 import axios from 'axios'
 
@@ -55,7 +55,8 @@ const More = ({ navigation }) => {
                         flexDirection: "row",
                         alignItems: "center",
                         // justifyContent: 'center',
-                        marginHorizontal: 22
+                        marginHorizontal: 22,
+                        marginVertical:20
                     }}>
 
                         <View style={{
@@ -81,7 +82,7 @@ const More = ({ navigation }) => {
                                 marginVertical: 48
                             }} />
                         </View>
-                        <Text style={{ ...FONTS.h3, marginVertical: 6 ,marginHorizontal:32 }}>
+                        <Text style={{ ...FONTS.h3, marginVertical: 6, marginHorizontal: 32 }}>
                             {userData?.fname} {userData?.lname}
                         </Text>
                     </View>
@@ -99,7 +100,7 @@ const More = ({ navigation }) => {
                                 alignItems: "center"
                             }}>
                                 <AntDesign name='user'
-                                    size={24}
+                                    size={25}
                                     color={COLORS.black} />
                                 <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
                                     Account
@@ -126,11 +127,10 @@ const More = ({ navigation }) => {
                                 flexDirection: "row",
                                 alignItems: "center"
                             }}>
-                                <Entypo name='light-down'
-                                    size={24}
-                                    color={COLORS.black} />
+
+                                <AntDesign name="shoppingcart" size={24} color="black" />
                                 <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                    Appearance
+                                    My Cart
                                 </Text>
                             </View>
                             <MaterialIcons
@@ -153,11 +153,9 @@ const More = ({ navigation }) => {
                                 flexDirection: "row",
                                 alignItems: "center"
                             }}>
-                                <Ionicons name='notifications-outline'
-                                    size={24}
-                                    color={COLORS.black} />
+                                <AntDesign name="hearto" size={24} color="black" />
                                 <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                    Notifications
+                                    My Wishlist
                                 </Text>
                             </View>
                             <MaterialIcons
@@ -180,11 +178,10 @@ const More = ({ navigation }) => {
                                 flexDirection: "row",
                                 alignItems: "center"
                             }}>
-                                <MaterialCommunityIcons name='shield-lock-open-outline'
-                                    size={24}
-                                    color={COLORS.black} />
+                                <MaterialIcons name="delivery-dining" size={24} color="black" />
+
                                 <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                    Privacy
+                                    My Order
                                 </Text>
                             </View>
                             <MaterialIcons
@@ -208,11 +205,9 @@ const More = ({ navigation }) => {
                                 flexDirection: "row",
                                 alignItems: "center"
                             }}>
-                                <MaterialCommunityIcons name='email-outline'
-                                    size={24}
-                                    color={COLORS.black} />
+                                <AntDesign name="delete" size={24} color="black" />
                                 <Text style={{ ...FONTS.h4, marginLeft: 12 }}>
-                                    Invite Your Friends
+                                    Delete Account
                                 </Text>
                             </View>
                             <MaterialIcons
@@ -234,7 +229,7 @@ const More = ({ navigation }) => {
                                 flexDirection: "row",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                marginTop: 22
+                                marginVertical:35
                             }}>
                                 <MaterialCommunityIcons name='logout-variant'
                                     size={24}

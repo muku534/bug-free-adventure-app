@@ -62,13 +62,7 @@ export default function App() {
                 headerShown: false
               }}
             />
-            <Stack.Screen name='DrawerNavigator' component={DrawerNavigator}
-              options={{
-                headerShown: false
-              }}
-            />
-
-
+           
             <Stack.Screen
               name="Home"
               component={BottomTabNavigation}

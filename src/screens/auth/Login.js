@@ -1,7 +1,7 @@
 import { View, Text, Image, Pressable, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
-import COLORS from '../../../constants/colors';
+import { COLORS, FONTS, SIZES, } from '../../../constants';
 import { Ionicons } from "@expo/vector-icons";
 // import Checkbox from "expo-checkbox"
 import Button from '../../components/Button';
@@ -185,15 +185,22 @@ const Login = ({ navigation }) => {
                     <Text>Remenber Me</Text>
                 </View> */}
 
-                    <Button
-                        title="Login"
-                        filled
-                        onPress={SignIn}
-                        style={{
-                            marginTop: 18,
-                            marginBottom: 4,
-                        }}
-                    />
+                    <TouchableOpacity onPress={SignIn}>
+                        <View style={{
+                            backgroundColor: COLORS.primaryBlue,
+                            paddingHorizontal: 52,
+                            paddingVertical: 15,
+                            marginVertical: 18,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                            // marginHorizontal: 52
+                        }}>
+                            <Text style={{ ...FONTS.body3, color: COLORS.secondaryWhite, fontWeight:'bold' }}>
+                                Login
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 20 }}>
                         <View

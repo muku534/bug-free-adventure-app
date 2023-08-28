@@ -12,6 +12,10 @@ const user7 = require('../assets/images/user7.jpg')
 const user8 = require('../assets/images/user8.jpg')
 const dims = require('../assets/images/dims.png')
 const CoverImg = require('../assets/drawer-cover.jpeg')
+const Accessories = require('../assets/images/Accessories.png')
+const Accessorie = require('../assets/images/Accessorie.png')
+const Computers = require('../assets/images/Computers.png')
+const Monitor = require('../assets/images/Monitor.png')
 
 export default {
     illustration,
@@ -27,5 +31,9 @@ export default {
     user8,
     usFlag,
     dims,
-    CoverImg
+    CoverImg,
+    Accessories,
+    Computers,
+    Monitor,
+    Accessorie
 }

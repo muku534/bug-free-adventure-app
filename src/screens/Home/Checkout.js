@@ -106,7 +106,7 @@ const Checkout = ({ navigation }) => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 marginHorizontal: 22,
-                                marginTop: 35,
+                                marginTop: 18,
                                 paddingBottom: 10
                             }}
                         >
@@ -116,7 +116,7 @@ const Checkout = ({ navigation }) => {
                                     size={28}
                                     style={{ color: COLORS.secondaryBlack }} />
                             </TouchableOpacity>
-                            <Text style={{ ...FONTS.h4 }}>Laptops</Text>
+                            <Text style={{ ...FONTS.h4 }}>Checkout</Text>
                         </View>
                         <View style={{ alignItems: 'center' }}>
                             <Text style={{

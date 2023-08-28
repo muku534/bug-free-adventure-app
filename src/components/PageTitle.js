@@ -28,14 +28,7 @@ const styles = StyleSheet.create({
         marginTop: 42,
         flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: COLORS.black,
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5
+       
     }
 })
 

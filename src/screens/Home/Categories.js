@@ -11,7 +11,7 @@ const CategoryButton = ({ title, onPress, imageSource }) => {
                 justifyContent: 'center',
                 height: 40,
                 width: 'auto',
-                backgroundColor: COLORS.primaryBlue,
+                // backgroundColor: COLORS.primaryBlue,
                 // borderWidth: 1,
                 borderRadius: 10,
                 // paddingHorizontal: 1,
